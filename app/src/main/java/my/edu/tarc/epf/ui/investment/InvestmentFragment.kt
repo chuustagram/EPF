@@ -8,9 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import my.edu.tarc.epf.R
-import my.edu.tarc.epf.databinding.FragmentHomeBinding
 import my.edu.tarc.epf.databinding.FragmentInvestmentBinding
 import java.util.*
 import java.util.Calendar.*
@@ -43,15 +43,56 @@ class InvestmentFragment : Fragment() {
             dateDialogFragment.show(parentFragmentManager, "DatePicker")
         }
         binding.buttonCalculate.setOnClickListener {
-            if (binding.buttonDOB.text != getString(R.string.dob)) {
-                val age = binding.textViewAge
-                when (age) {
-                    
+            if (binding.editTextBalanceAccount1.text.isEmpty()) {
+                binding.editTextBalanceAccount1.error = getString(R.string.error)
+                return@setOnClickListener // Terminate program execution
+            }
+            if (binding.buttonDOB.text == getString(R.string.dob)) {
+                binding.buttonDOB.error = getString(R.string.error)
+                return@setOnClickListener
+            }
+            binding.buttonDOB.error = null
+            val age = binding.textViewAge.text.toString().toInt()
+            val amount = binding.editTextBalanceAccount1.text.toString().toDouble()
+            var min_basic = 0.0
+            var total = 0.0
+            min_basic = when (age) {
+                in 16..20 -> {
+                    5000.0
                 }
+                in 21 .. 25 -> {
+                    14000.0
+                }
+                in 26 .. 30 -> {
+                    29000.0
+                }
+                in 31 .. 35 -> {
+                    50000.0
+                }
+                in 36 .. 40 -> {
+                    78000.0
+                }
+                in 41 .. 45 -> {
+                    116000.0
+                }
+                in 46 .. 50 -> {
+                    16500.0
+                }
+                in 51 .. 55 -> {
+                    228000.0
+                }
+                else -> amount
+            }
+            total = (amount - min_basic) * 0.3
+            if (total > 0.0) {
+                binding.textViewAmountInvestment.text = String.format("RM %.2f", total)
+            } else {
+                val toast = Toast.makeText(activity, "You do not have enough money for investment", Toast.LENGTH_SHORT).show()
             }
         }
 
         binding.buttonReset.setOnClickListener {
+            binding.buttonDOB.error = null
             binding.buttonDOB.text = getString(R.string.dob)
             binding.editTextBalanceAccount1.setText("")
             binding.textViewAge.text = ""
